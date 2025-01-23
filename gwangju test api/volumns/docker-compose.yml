@@ -1,0 +1,42 @@
+
+services:
+  fastapi_app:
+      build:
+        context: ../dockerRepository/gwangjutest/  # FastAPI Dockerfile이 있는 경로
+      container_name: fastapi_app
+      ports:
+        - "80:80"
+      depends_on:
+        - mariadb
+      networks:
+        - my_custom_network
+        
+  mariadb:
+      image: mariadb:latest
+      restart: always
+      build: 
+        context: ../sqls/
+      networks:
+        - my_custom_network
+      volumes:
+        - ../sqls/gwangju.sql:/docker-entrypoint-initdb.d/gwangju.sql
+      container_name: mariadb
+      environment:
+        MYSQL_ROOT_PASSWORD: ehdcns12!
+        MYSQL_DATABASE: edudb
+        MYSQL_USER: root
+      ports:
+        - "3306:3306"
+
+
+volumes:
+  mariadb_data:
+    driver: local
+
+networks:
+  my_custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24
+
