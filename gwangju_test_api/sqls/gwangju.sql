@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `gwangju` (
   `user_id` varchar(50) NOT NULL,
   `user_name` varchar(50) DEFAULT NULL,
   `student_id` varchar(50) NOT NULL,
+  `initial_time` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `character_type` varchar(50) DEFAULT NULL,
   `facial_expression_1` mediumblob DEFAULT NULL,
   `facial_expression_2` mediumblob DEFAULT NULL,
