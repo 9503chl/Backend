@@ -16,9 +16,6 @@ class UserTable(Base):
     facial_expression_4 = module.Column(module.BLOB)
     material_texture_1 = module.Column(module.BLOB)
     material_texture_2 = module.Column(module.BLOB)
-    material_texture_3 = module.Column(module.BLOB)
-    material_texture_4 = module.Column(module.BLOB)
-    material_texture_5 = module.Column(module.BLOB)
     screenshot_image = module.Column(module.BLOB)
     friend_name = module.Column(module.String(50))
     villain_name = module.Column(module.String(50))
@@ -42,9 +39,6 @@ class User(module.BaseModel):
     facial_expression_4: bytes
     material_texture_1: bytes
     material_texture_2: bytes
-    material_texture_3: bytes
-    material_texture_4: bytes
-    material_texture_5: bytes
     screenshot_image: bytes
     friend_name: str
     villain_name: str

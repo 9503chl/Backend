@@ -71,7 +71,7 @@ async def download_data(user_id: str, student_id: str, data_type: str, data_numb
             file_name = f"facial_expression_{data_number}.png"
             
         elif data_type == "material_texture":
-            if data_number not in [1, 2, 3, 4, 5]:
+            if data_number not in [1, 2]:
                 return {"success": "false", "message": "잘못된 material texture number입니다."}
             data = getattr(user, f"material_texture_{data_number}")
             message = f"material texture {data_number}"
@@ -300,9 +300,6 @@ async def create_E1(user_id: str = module.Form(...),
         existing_user.facial_expression_4 = facial_expression_4
         existing_user.material_texture_1 = material_texture_1
         existing_user.material_texture_2 = material_texture_2
-        existing_user.material_texture_3 = material_texture_3
-        existing_user.material_texture_4 = material_texture_4
-        existing_user.material_texture_5 = material_texture_5
         existing_user.screenshot_image = screenshot_image
 
         # DB에 변경사항 저장
