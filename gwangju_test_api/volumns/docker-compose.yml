@@ -2,7 +2,7 @@
 services:
   fastapi_app:
       build:
-        context: ../dockerRepository/gwangjutest/  # FastAPI Dockerfile이 있는 경로
+        context: ../python/  # FastAPI Dockerfile이 있는 경로
       container_name: fastapi_app
       ports:
         - "80:80"
@@ -10,6 +10,7 @@ services:
         - mariadb
       networks:
         - my_custom_network
+      restart: always
         
   mariadb:
       image: mariadb:latest

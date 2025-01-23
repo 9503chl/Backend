@@ -8,6 +8,7 @@ class UserTable(Base):
     user_id = module.Column(module.Integer, primary_key=True, autoincrement=True)
     user_name = module.Column(module.String(50), nullable=False)
     student_id = module.Column(module.String(50), nullable=False)
+    initial_time = module.Column(module.datetime, nullable=False)
     character_type = module.Column(module.String(50), nullable=False)
     facial_expression_1 = module.Column(module.BLOB)
     facial_expression_2 = module.Column(module.BLOB)

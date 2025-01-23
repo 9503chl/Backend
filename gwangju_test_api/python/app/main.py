@@ -3,6 +3,7 @@ from .model import User,UserTable
 from .db import session
 
 
+
 app = module.FastAPI()
 
 app.add_middleware(
@@ -12,6 +13,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 특정 조건에 따라 오래된 데이터를 삭제하는 함수
+def delete_old_data():
+    try:
+        threshold = module.datetime.now() - module.timedelta(hours=72)  # 72시간이 지난 데이터 삭제
+        users = session.query(UserTable).filter(UserTable.initial_time < threshold).all()
+        
+        for user in users:
+            session.delete(user)
+        
+        session.commit()
+        print(f"{len(users)}개의 오래된 데이터가 삭제되었습니다.")
+        
+    except Exception as e:
+        session.rollback()
+        print(f"데이터 삭제 중 오류 발생: {str(e)}")
+
+# 스케줄러 설정
+scheduler = module.BackgroundScheduler()
+scheduler.add_job(delete_old_data, 'interval', hours=1)  # 1시간마다 실행
+scheduler.start()
+
 
 @app.get("/")
 def read_root():
@@ -232,6 +255,7 @@ async def create_test_user(user_name: str):
             user_id=user_id,
             user_name=random_name,
             student_id=random_student_id,
+            initial_time=module.datetime.now()
         )
 
         # DB에 저장
