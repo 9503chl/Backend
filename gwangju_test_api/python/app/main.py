@@ -2,8 +2,6 @@ from .mypackage import module
 from .model import User,UserTable
 from .db import session
 
-
-
 app = module.FastAPI()
 
 app.add_middleware(
@@ -14,10 +12,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # 특정 조건에 따라 오래된 데이터를 삭제하는 함수
 def delete_old_data():
     try:
-        threshold = module.datetime.now() - module.timedelta(hours=72)  # 72시간이 지난 데이터 삭제
+        threshold = module.datetime.now() - module.timedelta(hours=24)  # 24시간이 지난 데이터 삭제
         users = session.query(UserTable).filter(UserTable.initial_time < threshold).all()
         
         for user in users:
@@ -29,12 +28,11 @@ def delete_old_data():
     except Exception as e:
         session.rollback()
         print(f"데이터 삭제 중 오류 발생: {str(e)}")
-
+ 
 # 스케줄러 설정
 scheduler = module.BackgroundScheduler()
-scheduler.add_job(delete_old_data, 'interval', hours=1)  # 1시간마다 실행
+scheduler.add_job(delete_old_data, 'interval', hours=24)  # 24시간마다 실행
 scheduler.start()
-
 
 @app.get("/")
 def read_root():
@@ -49,7 +47,7 @@ def read_root():
         return {"success": "true", "message": "사용자 목록 조회 성공", "users": user_list}
     except Exception as e:
         return {"success": "false", "message": str(e)}
-
+  
 @app.get("/download/{data_type}/{data_number}")
 async def download_data(user_id: str, student_id: str, data_type: str, data_number: int = None):
     try:
@@ -281,9 +279,6 @@ async def create_E1(user_id: str = module.Form(...),
                    facial_expression_4: module.UploadFile = module.File(...),
                    material_texture_1: module.UploadFile = module.File(...),
                    material_texture_2: module.UploadFile = module.File(...),
-                   material_texture_3: module.UploadFile = module.File(...),
-                   material_texture_4: module.UploadFile = module.File(...),
-                   material_texture_5: module.UploadFile = module.File(...),
                    screenshot_image: module.UploadFile = module.File(...)):
     try:
         # user_id에 해당하는 사용자 찾기

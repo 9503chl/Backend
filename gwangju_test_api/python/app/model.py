@@ -8,7 +8,7 @@ class UserTable(Base):
     user_id = module.Column(module.Integer, primary_key=True, autoincrement=True)
     user_name = module.Column(module.String(50), nullable=False)
     student_id = module.Column(module.String(50), nullable=False)
-    initial_time = module.Column(module.datetime, nullable=False)
+    initial_time = module.Column(module.DateTime, nullable=False)
     character_type = module.Column(module.String(50), nullable=False)
     facial_expression_1 = module.Column(module.BLOB)
     facial_expression_2 = module.Column(module.BLOB)
@@ -29,10 +29,12 @@ class UserTable(Base):
     video_file = module.Column(module.BLOB)
 
 class User(module.BaseModel):
+    model_config = module.ConfigDict(arbitrary_types_allowed=True)
     user_id: str
     user_name: str
     student_id: str
     character_type: str
+    initial_time: module.datetime
     facial_expression_1: bytes
     facial_expression_2: bytes
     facial_expression_3: bytes

@@ -46,6 +46,14 @@ CREATE TABLE IF NOT EXISTS `gwangju` (
   PRIMARY KEY (`user_id`,`student_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci COMMENT='광주 테스트용';
 
+SET GLOBAL event_scheduler = ON;
+
+CREATE EVENT delete_old_data
+ON SCHEDULE EVERY 1 DAY
+DO
+  DELETE FROM gwangju
+  WHERE initial_time < NOW() - INTERVAL 30 DAY;
+
 -- 내보낼 데이터가 선택되어 있지 않습니다.
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
