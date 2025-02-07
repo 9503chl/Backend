@@ -19,6 +19,12 @@
 CREATE DATABASE IF NOT EXISTS `edudb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci */;
 USE `edudb`;
 
+-- 이벤트 edudb.delete_old_data 구조 내보내기
+DELIMITER //
+CREATE EVENT `delete_old_data` ON SCHEDULE EVERY 1 DAY STARTS '2025-01-24 13:36:00' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM gwangju
+  WHERE initial_time < NOW() - INTERVAL 30 DAY//
+DELIMITER ;
+
 -- 테이블 edudb.gwangju 구조 내보내기
 CREATE TABLE IF NOT EXISTS `gwangju` (
   `user_id` varchar(50) NOT NULL,
@@ -43,16 +49,9 @@ CREATE TABLE IF NOT EXISTS `gwangju` (
   `motion_data_4` mediumtext DEFAULT NULL,
   `motion_data_5` mediumtext DEFAULT NULL,
   `video_file` longblob DEFAULT NULL,
+  `video_thumbnail` longblob DEFAULT NULL,
   PRIMARY KEY (`user_id`,`student_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci COMMENT='광주 테스트용';
-
-SET GLOBAL event_scheduler = ON;
-
-CREATE EVENT delete_old_data
-ON SCHEDULE EVERY 1 DAY
-DO
-  DELETE FROM gwangju
-  WHERE initial_time < NOW() - INTERVAL 30 DAY;
 
 -- 내보낼 데이터가 선택되어 있지 않습니다.
 

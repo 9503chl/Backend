@@ -85,6 +85,11 @@ async def download_data(user_id: str, student_id: str, data_type: str, data_numb
             message = "video file"
             file_name = "video.mp4"
             
+        elif data_type == "video_thumbnail":
+            data = user.video_thumbnail
+            message = "video thumbnail"
+            file_name = "thumbnail.png"
+        
         else:
             raise module.HTTPException(status_code=404, detail="잘못된 데이터 타입입니다.")
 
@@ -226,7 +231,7 @@ async def get_E5(user_id: str):
                 "user_name": user.user_name,
                 "student_id": user.student_id,
                 "character_type": user.character_type,
-                "facial_expression_1": f"{user.facial_url_1} url",
+
                 "scenario_text": user.scenario_text,
                 "video_url": f"{user.video_url} url"
             }
@@ -236,7 +241,7 @@ async def get_E5(user_id: str):
         return {"success": "false", "message": str(e)}
 
 @app.post("/test/")
-async def create_test_user(user_name: str):
+async def create_test_user(user_name: str = module.Form(...)):
     try:
  
         # 랜덤 user_id 생성 (6자리 숫자)
@@ -375,7 +380,8 @@ async def post_E3(user_id: str = module.Form(...), student_id: str = module.Form
 @app.post("/E4Post/")
 async def post_E4(user_id: str = module.Form(...),
                   student_id: str = module.Form(...),
-                   video_file: bytes = module.Form(...)):
+                   video_file: bytes = module.Form(...),
+                   video_thumbnail: bytes = module.Form(...)):
     try:
         # user_id로 사용자 찾기
         user = session.query(UserTable).filter(UserTable.user_id == user_id, UserTable.student_id == student_id).first()
@@ -385,10 +391,12 @@ async def post_E4(user_id: str = module.Form(...),
 
         # 파일 내용 읽기
         file_contents = await video_file.read()
-        
+        thumbnail_contents = await video_thumbnail.read()
+
         # 비디오 파일 업데이트
         user.video_file = file_contents
-        
+        user.video_thumbnail = thumbnail_contents
+
         session.commit()
 
         return {

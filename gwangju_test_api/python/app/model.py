@@ -26,6 +26,7 @@ class UserTable(Base):
     motion_data_3 = module.Column(module.String(50))
     motion_data_4 = module.Column(module.String(50))
     motion_data_5 = module.Column(module.String(50))
+    video_thumbnail = module.Column(module.BLOB)
     video_file = module.Column(module.BLOB)
 
 class User(module.BaseModel):
@@ -51,5 +52,6 @@ class User(module.BaseModel):
     motion_data_3: str
     motion_data_4: str
     motion_data_5: str
+    video_thumbnail: bytes
     video_file: bytes
     
