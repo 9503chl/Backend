@@ -17,4 +17,4 @@ async function handleSubmit(formData: FormData) {
   revalidatePath('/list')
 }
 
-export { getData, handleSubmit }
+export { getData, handleSubmit }  

@@ -1,8 +1,16 @@
 'use client'
 
-import { signIn, signOut } from "next-auth/react";
+import { getSession, signIn, signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
 
-export default async function LoginoutBtn() {
+export default function LoginoutBtn() {
+
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    useEffect(()=>{
+        getSession().then((session) => {
+            setIsLoggedIn(!!session);
+        })
+    }, [])
 
     return (
         <div>
@@ -17,6 +25,9 @@ export default async function LoginoutBtn() {
                     redirect: true
                 })
             }}>로그아웃</button>
+            <button onClick={()=>{
+                window.location.href = '/register'
+            }} disabled={isLoggedIn}>회원가입</button>
         </div>
     )
 }
