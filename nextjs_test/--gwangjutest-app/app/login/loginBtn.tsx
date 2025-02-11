@@ -1,7 +1,7 @@
 'use client'
 
-import { signIn, signOut, useSession } from 'next-auth/react';
-import { SessionProvider } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
+import SessionProvider from '../component/SessionProvider';
 
 export default function LoginButton() {
   return (
@@ -12,7 +12,7 @@ export default function LoginButton() {
 }
 
 function LoginButtonContent() {
-  const { data: session } = useSession();
+  const session = localStorage.getItem('session');
 
   if (session) {
     return (

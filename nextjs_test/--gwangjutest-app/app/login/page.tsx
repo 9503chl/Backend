@@ -27,8 +27,9 @@ export default function LoginPage() {
       }
 
       if (data.session) {
-        console.log(data.session);
-        // 로그인 성공 후 처리
+        const session = data.session;
+        localStorage.setItem('session', JSON.stringify(session));
+        window.location.href = '/';
       }
     } catch (err) {
       setError('로그인 중 오류가 발생했습니다.');
