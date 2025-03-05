@@ -9,17 +9,19 @@ export default async function handleLogin(req: NextApiRequest, res: NextApiRespo
       email: req.body.email,
     });
 
-    if (accountData?.password && await bcrypt.compare(req.body.password, accountData.password)) {
-      const session = {
-        user: {
-          id: accountData?._id,
-          email: accountData?.email,
-          name: accountData?.name
-        },
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    if (accountData?.password) {
+      const user = {
+        id: accountData._id.toString(),
+        email: accountData.email,
+        name: accountData.name
       };
 
-      return res.status(200).json({ session });
+      const isValid = await bcrypt.compare(req.body.password, accountData.password);
+      if (!isValid) {
+        return res.status(401).json({ error: '이메일 또는 비밀번호가 일치하지 않습니다.' });
+      }
+
+      return res.status(200).json({ user });
 
     } else {
       res.status(401).json({ error: '이메일 또는 비밀번호가 일치하지 않습니다.' });

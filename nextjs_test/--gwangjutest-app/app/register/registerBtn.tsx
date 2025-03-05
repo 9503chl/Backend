@@ -1,10 +1,9 @@
 'use client'
 
-import { useSession } from "next-auth/react";
-import SessionProvider from "../component/SessionProvider";
+import { SessionProvider, useSession } from "next-auth/react";
 
 function RegisterButtonContent() {
-  const session = localStorage.getItem('session');
+  const { data: session } = useSession();
   
   return (
     <>

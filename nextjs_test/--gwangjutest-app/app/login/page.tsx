@@ -1,36 +1,38 @@
 'use client'
 
 import { useState } from 'react';
+import { useSession, signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  if (session) {
+    setTimeout(() => {
+      router.push('/');
+    }, 0);
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password })
+      const result = await signIn('custom', {
+        email,
+        password,
+        redirect: false
       });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        setError(data.error);
+      if (result?.error) {
+        setError('이메일 또는 비밀번호가 일치하지 않습니다.');
         return;
       }
 
-      if (data.session) {
-        const session = data.session;
-        localStorage.setItem('session', JSON.stringify(session));
-        window.location.href = '/';
-      }
     } catch (err) {
       setError('로그인 중 오류가 발생했습니다.');
       console.error(err);

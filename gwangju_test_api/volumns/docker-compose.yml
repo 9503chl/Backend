@@ -28,6 +28,14 @@ services:
         MYSQL_USER: root
       ports:
         - "3306:3306"
+      deploy:
+        resources:
+          limits:
+            cpus: "1.5"
+            memory: "1G"
+          reservations:
+            cpus: "0.5"
+            memory: "512M"
 
 
 volumes:

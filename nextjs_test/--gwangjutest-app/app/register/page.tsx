@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const { update } = useSession();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +30,14 @@ export default function RegisterPage() {
         setError(data.error);
         return;
       }
+
+      // 세션 업데이트
+      await update({
+        ...data.session,
+        user: {
+          email: email
+        }
+      });
 
       setSuccess('회원가입이 완료되었습니다.');
       setTimeout(() => {

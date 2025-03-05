@@ -3,7 +3,7 @@ from .mypackage import module
 # @는 hostName, /db 이름
 DATABASEURL = f"mysql+pymysql://{module.db_userName}:{module.db_userPassword}@{module.mariadb_container_name}:{module.db_port}/{module.db_tableName}"
 
-ENGINE = module.create_engine(DATABASEURL, echo=True)
+ENGINE = module.create_engine(DATABASEURL, echo=True, pool_size=10, max_overflow=20)
 
 session = module.scoped_session(module.sessionmaker(autocommit=False, autoflush=False, bind=ENGINE))
 

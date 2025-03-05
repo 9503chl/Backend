@@ -126,33 +126,28 @@ async def get_E1(user_id: str, student_id: str):
             "student_id": user.student_id,
         }
             
-        return {"success": "true", "data": user_data}
+        return user_data
         
     except Exception as e:
         return {"success": "false", "message": str(e)}
 
 @app.get("/E2Get")
-async def get_E2(user_id: str, student_id: str, screenshot_image: module.UploadFile = module.File(...)):
+async def get_E2(user_id: str, student_id: str):
     try:
         # user_id와 student_id에 해당하는 사용자 찾기
         user = session.query(UserTable).filter(UserTable.user_id == user_id & UserTable.student_id == student_id).first()
         
         if not user:
             return {"success": "false", "message": "해당 사용자를 찾을 수 없습니다."}
-
-        # 사용자 데이터 반환
-        # BLOB 데이터를 BytesIO로 변환
-        file_stream = module.io.BytesIO(user.screenshot_image)
         
-        return {
-            "success": "true",
-            "data": {
-                "user_id": user.user_id,
-                "user_name": user.user_name,
-                "student_id": user.student_id,
-                "character_type": user.character_type,
-            }
+        user_data = {
+            "user_id": str(user.user_id),
+            "user_name": user.user_name,
+            "student_id": user.student_id,
+            "character_type": user.character_type,
         }
+
+        return user_data
 
     except Exception as e:
         return {"success": "false", "message": str(e)}
@@ -169,15 +164,14 @@ async def get_E3(user_id: str, student_id: str):
         if not user:
             return {"success": "false", "message": "해당 사용자를 찾을 수 없습니다."}
 
-        return {
-            "success": "true",
-            "data": {
-                "user_id": user.user_id,
-                "user_name": user.user_name,
-                "student_id": user.student_id,
-                "character_type": user.character_type,
-            }
+        user_data = {
+            "user_id": str(user.user_id),
+            "user_name": user.user_name,
+            "student_id": user.student_id,
+            "character_type": user.character_type,
         }
+
+        return user_data
 
     except Exception as e:
         return {"success": "false", "message": str(e)}
@@ -194,15 +188,13 @@ async def get_E4(user_id: str, student_id: str):
         if not user:
             return {"success": "false", "message": "해당 사용자를 찾을 수 없습니다."}
 
-        return {
-            "status": "success", 
-            "data": {
-                "user_id": user.user_id,
-                "user_name": user.user_name,
-                "student_id": user.student_id,
-                "character_type": user.character_type,
-                "friend_name": user.friend_name,
-                "villain_name": user.villain_name,
+        user_data = {
+            "user_id": str(user.user_id),
+            "user_name": user.user_name,
+            "student_id": user.student_id,
+            "character_type": user.character_type,
+            "friend_name": user.friend_name,
+            "villain_name": user.villain_name,
                 "scenario_text": user.scenario_text,
                 "motion_data_1": user.motion_data_1,
                 "motion_data_2": user.motion_data_2,
@@ -210,7 +202,8 @@ async def get_E4(user_id: str, student_id: str):
                 "motion_data_4": user.motion_data_4,
                 "motion_data_5": user.motion_data_5,
             }
-        }
+        
+        return user_data
 
     except Exception as e:
         return {"success": "false", "message": str(e)}
@@ -225,13 +218,11 @@ async def get_E5(user_id: str):
             return {"success": "false", "message": "해당 사용자를 찾을 수 없습니다."}
 
         return {
-            "status": "success",
-            "data": {
+            {
                 "user_id": user.user_id,
                 "user_name": user.user_name,
                 "student_id": user.student_id,
                 "character_type": user.character_type,
-
                 "scenario_text": user.scenario_text,
                 "video_url": f"{user.video_url} url"
             }
@@ -243,35 +234,28 @@ async def get_E5(user_id: str):
 @app.post("/test/")
 async def create_test_user(user_name: str = module.Form(...)):
     try:
- 
-        # 랜덤 user_id 생성 (6자리 숫자)
-        user_id = ''.join(module.random.choices(module.string.digits, k=6))
+        # 랜덤 ID 생성을 한번에 처리
+        user_id = f"{module.random.randint(0, 999999):06d}"
+        random_student_id = f"{module.random.randint(0, 99999999):08d}"
         
-        # 랜덤 student_id 생성 (8자리 숫자)
-        random_student_id = ''.join(module.random.choices(module.string.digits, k=8))
-        
-        # 랜덤 이름 생성 
-        random_name = user_name
-        
-        # 테스트 사용자 데이터 생성
-        test_user = UserTable(
-            user_id=user_id,
-            user_name=random_name,
-            student_id=random_student_id,
-            initial_time=module.datetime.now()
-        )
+        # DB 세션 최적화를 위해 expire_on_commit=False 설정
+        with session.begin():
+            test_user = UserTable(
+                user_id=user_id,
+                user_name=user_name,
+                student_id=random_student_id,
+                initial_time=module.datetime.now()
+            )
+            session.add(test_user)
+            
+            user_data = {
+                "user_id": user_id,
+                "student_id": random_student_id
+            }
 
-        # DB에 저장
-        session.add(test_user)
-        session.commit()
-
-        return {
-            "user_id": test_user.user_id,
-            "student_id": test_user.student_id
-        }
+        return user_data
 
     except Exception as e:
-        session.rollback()
         return {"success": "false", "message": str(e)}
 
 @app.post("/E1Post/")

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useSession } from 'next-auth/react';
 
 interface UserInfo {
   email: string;
@@ -9,20 +10,22 @@ interface UserInfo {
   name: string;
 }
 
-export default function DetailPage({
-  searchParams
-}: {
-  searchParams: { email: string }
-}) {
+export default function DetailPage() {
+  const { data: session, status } = useSession();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch(`/api/user?email=${searchParams.email}`);
+        if (!session?.user?.email) {
+          throw Error('세션 정보가 없습니다.');
+        }
+          
+        const response = await fetch(`/api/detail?email=${session.user.email}`); 
+        
         if (!response.ok) {
-          throw new Error('사용자 정보를 가져오는데 실패했습니다.');
+          throw Error('사용자 정보를 가져오는데 실패했습니다.');
         }
         const data = await response.json();
         setUserInfo(data);
@@ -32,10 +35,18 @@ export default function DetailPage({
       }
     };
 
-    if (searchParams.email) {
+    if (session?.user?.email) {
       fetchUserInfo();
     }
-  }, [searchParams.email]);
+  }, [session]);
+
+  if (status === "loading") {
+    return <div>로딩중...</div>;
+  }
+
+  if (!session) {
+    return <div>로그인이 필요합니다.</div>;
+  }
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
@@ -51,20 +62,43 @@ export default function DetailPage({
   });
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">사용자 정보</h1>
+    <div>
+      <h1>사용자 정보</h1>
       
-      <div className="mb-4">
+      <div>
         <p><strong>이메일:</strong> {userInfo.email}</p>
-        <p><strong>이름:</strong> {userInfo.name}</p>
+        <p><strong>이름:</strong> {userInfo.user_id}</p>
         <p><strong>학번:</strong> {userInfo.student_id}</p>
       </div>
 
-      <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">QR 코드</h2>
-        <div className="p-4 bg-white inline-block rounded-lg shadow-md">
-          <QRCodeSVG value={qrData} size={256} />
-        </div>
+      <div>
+        <h2>QR 코드 <button onClick={() => {
+          const svg = document.querySelector('svg');
+          if (svg) {
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              const img = new Image();
+              img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                const pngFile = canvas.toDataURL('image/png');
+                const downloadLink = document.createElement('a');
+                downloadLink.download = 'qr-code.png';
+                downloadLink.href = pngFile;
+                downloadLink.click();
+              };
+              img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+            }
+          }
+        }}>
+          다운로드
+        </button></h2>
+        <div>
+          <QRCodeSVG value={qrData} size={256} />  
+        </div> 
       </div>
     </div>
   );
