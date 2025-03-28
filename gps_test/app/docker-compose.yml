@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  fastapi_app:
+      build:
+        context: ./
+      container_name: fastapi_app
+      ports:
+        - "8000:8000"
+      networks:
+        - my_custom_network
+      restart: always
+      environment:
+        - ADMIN_USERNAME=developer_choe
+        - ADMIN_PASSWORD=ehdcns12!
+        - MONGO_URI=mongodb+srv://9503chl:ehdcns12!@cluster0.y86t7.mongodb.net/
+        - DB_NAME=gps_test
+
+networks:
+  my_custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24

@@ -1,0 +1,17 @@
+services:
+  fastapi_app:
+      build:
+        context: ./  # FastAPI Dockerfile이 있는 경로
+      container_name: fastapi_app
+      ports:
+        - "8000:8000"
+      networks:
+        - my_custom_network
+      restart: always
+
+networks:
+  my_custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24

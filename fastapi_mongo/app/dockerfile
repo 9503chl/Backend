@@ -1,0 +1,24 @@
+# 기본 Python 이미지 사용
+FROM python:3.9
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 필요한 파일들 복사
+COPY requirements.txt .
+COPY main.py .
+COPY database.py .
+COPY model.py .
+COPY mypackage/ ./mypackage/
+
+# 필요한 패키지 설치
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 현재 디렉토리를 PYTHONPATH에 추가
+ENV PYTHONPATH=/app
+
+# 포트 설정 
+EXPOSE 8080
+
+# 애플리케이션 실행
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
