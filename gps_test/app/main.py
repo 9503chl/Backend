@@ -44,7 +44,8 @@ async def save_position(
     username: str = Depends(authenticate),
     x: str = Form(...), 
     y: str = Form(...), 
-    label: str = Form(...)
+    label: str = Form(...),
+    mesh : str = Form(...)
 ):
     db = None  # db 변수를 미리 선언
     try:
@@ -77,7 +78,8 @@ async def save_position(
             "y": y_float,
             "timestamp": datetime.now(),
             "label": label,
-            "created_by": username
+            "created_by": username,
+            "mesh": mesh
         }
         
         result = db.db["positions"].insert_one(position_data)
