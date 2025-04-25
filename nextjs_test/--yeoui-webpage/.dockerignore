@@ -1,0 +1,38 @@
+# 버전 관리
+.git
+.gitignore
+
+# 의존성
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Next.js 빌드 출력
+.next
+out
+
+# 테스트 파일
+__tests__
+coverage
+
+# 환경 변수 파일
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Docker 관련 파일
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# 데이터 디렉토리 (볼륨으로 마운트)
+data
+public/uploads
+
+# 기타
+README.md
+*.md
+*.log 

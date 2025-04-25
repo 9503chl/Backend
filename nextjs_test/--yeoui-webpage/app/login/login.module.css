@@ -1,0 +1,75 @@
+.loginContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #1a1a1a;
+}
+
+.loginForm {
+  background-color: #2a2a2a;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.formTitle {
+  color: white;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.passwordInput {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  background-color: #333;
+  color: white;
+  font-size: 1rem;
+}
+
+.passwordInput:focus {
+  outline: none;
+  border-color: #1a73e8;
+}
+
+.loginButton {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.loginButton:hover {
+  background-color: #1557b0;
+}
+
+.loginButton:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  color: #ff4444;
+  margin-top: 0.5rem;
+  text-align: center;
+} 
