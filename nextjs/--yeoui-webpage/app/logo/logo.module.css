@@ -1,0 +1,166 @@
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #111;
+  color: #eee;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  color: #8ab4f8;
+  text-decoration: none;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.backButton:hover {
+  text-decoration: underline;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.imageContainer {
+  width: 100%;
+  background-color: transparent;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.imageContainer:hover {
+  border-color: #007bff;
+  background-color: transparent;
+}
+
+.imageContainer:hover .previewImage {
+  opacity: 0.8;
+}
+
+.previewImage {
+  max-width: 100%;
+  height: auto;
+  transition: opacity 0.2s ease;
+}
+
+.placeholder {
+  color: #aaa;
+  font-size: 1.2rem;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.fileInput {
+  display: none;
+}
+
+.uploadButton {
+  background-color: #8ab4f8;
+  color: #111;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.uploadButton:hover {
+  background-color: #9fc5f8;
+}
+
+.saveButton {
+  background-color: #67c23a;
+  color: #111;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.saveButton:hover {
+  background-color: #85ce61;
+}
+
+.saveButton:disabled {
+  background-color: #555;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.error {
+  background-color: #4d2424;
+  color: #ff8080;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.imageControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #222;
+  border-radius: 8px;
+}
+
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.controlGroup label {
+  font-size: 0.9rem;
+  color: #eee;
+  min-width: 80px;
+}
+
+.controlGroup input {
+  width: 80px;
+  padding: 0.5rem;
+  background-color: #333;
+  color: #eee;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.controlGroup input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.controlGroup span {
+  font-size: 0.8rem;
+  color: #ccc;
+} 

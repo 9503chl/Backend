@@ -1,0 +1,31 @@
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.backButton {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.backButton:hover {
+  text-decoration: underline;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+} 

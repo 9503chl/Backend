@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 238, 238, 238;
+  --background-start-rgb: 25, 25, 25;
+  --background-end-rgb: 34, 34, 34;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.screenshot-capture-area {
+  width: 2000px !important; /* 너비를 2000px로 고정 */
+  margin: 0 auto; /* 페이지 중앙 정렬 (선택 사항, 필요 없으면 제거) */
+  /* For testing, to see its bounds, you can add a temporary background or border:
+  background-color: rgba(255, 0, 0, 0.1); 
+  border: 1px solid red;
+  */
+  /* Ensure it can grow vertically as much as needed by content */
+  height: auto !important;
+  overflow: visible !important; /* Ensure no content is clipped for capture if children overflow */
+}
+
+.screenshot-capture-area .ProseMirror {
+  width: 100% !important; /* 부모(.screenshot-capture-area) 너비(2000px)를 꽉 채움 */
+  height: auto !important; /* 내용에 따라 높이 자동 조절 */
+  /* Ensure ProseMirror itself doesn't clip its content, though this is usually fine */
+  overflow: visible !important; 
+}
+
+/* Ensure specific text elements or common block elements within the capture area 
+   also allow content to be fully visible and don't have restrictive overflows. 
+   This might be overkill but can help if specific child elements cause clipping. */
+.screenshot-capture-area div,
+.screenshot-capture-area p,
+.screenshot-capture-area h1,
+.screenshot-capture-area h2,
+.screenshot-capture_area h3,
+.screenshot-capture-area span,
+.screenshot-capture-area li,
+.screenshot-capture-area article,
+.screenshot-capture-area section {
+  overflow: visible !important; /* Or at least overflow-x: visible; overflow-y: visible; */
+}
+
+/* === NEWLY ADDED FOR TIP TAP IMAGES === */
+.ProseMirror .tiptap-image {
+  display: inline-block; /* Or consider `block` if you prefer images on their own line by default */
+  max-width: 100%;    /* Ensures the image is not wider than its container */
+  height: auto;       /* Maintains aspect ratio */
+  /* By not setting a specific `width` here, 
+     the `width` attribute from the <img> tag (e.g., width="500") 
+     or a more specific style (like from ImageToolbar) can take precedence. */
+}
+
+/* Style for the selected image node (optional, adjust as needed) */
+.ProseMirror .tiptap-image.ProseMirror-selectednode {
+  outline: 3px solid #68CEF8; /* Default Tiptap selection style */
+}
+/* === END OF NEWLY ADDED === */
+
+/* The problematic rule causing images to be 2000px wide */
+/*
+.editor-image, .ProseMirror img, img.tiptap-image {
+    width: 2000px !important;
+    height: auto !important;
+    max-width: none !important;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+*/

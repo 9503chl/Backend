@@ -1,13 +1,12 @@
 from mypackage.module import (
     FastAPI, Depends, HTTPException, status,
     HTTPBasic, HTTPBasicCredentials,
-    datetime, Form,
-    CORSMiddleware,
-    ADMIN_USERNAME,
-    ADMIN_PASSWORD,
-    Database,
-    secrets
+    datetime, Form, File, UploadFile,
+    CORSMiddleware, JSONResponse, RequestValidationError,
+    ADMIN_USERNAME, ADMIN_PASSWORD, Database,
+    secrets, logger
 )
+import base64
 
 app = FastAPI()
 security = HTTPBasic()
@@ -15,11 +14,20 @@ security = HTTPBasic()
 # CORS 미들웨어 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 모든 origin 허용 (실제 운영 환경에서는 특정 도메인으로 제한하는 것이 좋습니다)
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # 모든 HTTP 메소드 허용
-    allow_headers=["*"],  # 모든 HTTP 헤더 허용
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+# 422 에러 핸들러 추가
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc):
+    logger.error(f"Validation error: {exc}")
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": str(exc)}
+    )
 
 # 사용자 인증 함수
 def authenticate(credentials: HTTPBasicCredentials = Depends(security)):
@@ -42,44 +50,48 @@ def read_secure_data(username: str = Depends(authenticate)):
 @app.post("/position")
 async def save_position(
     username: str = Depends(authenticate),
-    x: str = Form(...), 
-    y: str = Form(...), 
-    label: str = Form(...),
-    mesh : str = Form(...)
+    texture: str = Form(...),
+    object_index: str = Form(...),
+    sticker_index: str = Form(...),
+    text: str = Form(...),
+    x: str = Form(...),
+    y: str = Form(...)
 ):
-    db = None  # db 변수를 미리 선언
+    db = None
     try:
         # 문자열을 float으로 변환
         try:
             x_float = float(x)
             y_float = float(y)
-        except ValueError:
-            return {
-                "status": "error",
-                "message": "x와 y 값은 숫자 형식이어야 합니다"
-            }
+            object_index_int = int(object_index)
+            sticker_index_int = int(sticker_index)
+        except ValueError as ve:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid numeric values: {str(ve)}"
+            )
 
-        db = Database()  # db 초기화
+        # text 값 인코딩 처리
+        try:
+            encoded_text = text.encode('utf-8').decode('utf-8')
+        except UnicodeError as ue:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid text encoding: {str(ue)}"
+            )
 
-        # 중복 체크: 동일한 라벨이 있는지 확인
-        existing_position = db.db["positions"].find_one({
-            "label": label
-        })
-        
-        if existing_position:
-            return {
-                "status": "error", 
-                "message": "이미 동일한 위치와 라벨이 존재합니다"
-            }
+        db = Database()
 
         # 새로운 위치 데이터 저장
         position_data = {
+            "texture": texture,  # 이미 base64로 인코딩된 문자열
+            "object_index": object_index_int,
+            "sticker_index": sticker_index_int,
+            "text": encoded_text,
             "x": x_float,
             "y": y_float,
             "timestamp": datetime.now(),
-            "label": label,
-            "created_by": username,
-            "mesh": mesh
+            "created_by": username
         }
         
         result = db.db["positions"].insert_one(position_data)
@@ -87,62 +99,70 @@ async def save_position(
         if result.inserted_id:
             return {
                 "status": "success",
-                "message": "위치가 성공적으로 저장되었습니다"
+                "message": "Position saved successfully"
             }
         else:
-            return {
-                "status": "error",
-                "message": "위치 저장에 실패했습니다"
-            }
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to save position"
+            )
             
+    except HTTPException as he:
+        raise he
     except Exception as e:
-        return {
-            "status": "error",
-            "message": f"오류가 발생했습니다: {str(e)}"
-        }
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred: {str(e)}"
+        )
     
     finally:
-        if db:  # db가 None이 아닐 때만 close 호출
+        if db:
             db.close()
 
 @app.get("/positions")
 async def get_positions(username: str = Depends(authenticate)):
-    db = None  # db 변수를 미리 선언
+    db = None
     try:
-        db = Database()  # db 초기화
+        db = Database()
         positions = list(db.db["positions"].find({}, {"_id": 0}))
         
         if positions:
             return {
                 "status": "success",
-                "message": f"{username}님이 조회한 모든 위치 데이터입니다",
+                "message": f"All position data retrieved for {username}",
                 "user_info": positions
             }
         else:
             return {
                 "status": "success", 
-                "message": "저장된 위치 데이터가 없습니다",
+                "message": "No position data found",
                 "user_info": []
             }
             
     except Exception as e:
-        return {
-            "status": "error",
-            "message": f"오류가 발생했습니다: {str(e)}"
-        }
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred while retrieving positions: {str(e)}"
+        )
         
     finally:
-        if db:  # db가 None이 아닐 때만 close 호출
+        if db:
             db.close()
 
 @app.post("/delete_position")
 async def delete_position(
     username: str = Depends(authenticate),
-    label: str = Form(...)
+    texture: str = Form(...),
+    object_index: int = Form(...),
+    sticker_index: int = Form(...)
 ):
     try:
         db = Database()
-        result = db.db["positions"].delete_one({"label": label})
+        result = db.db["positions"].delete_one({
+            "texture": texture,
+            "object_index": object_index,
+            "sticker_index": sticker_index
+        })
         
         if result.deleted_count > 0:
             return {
